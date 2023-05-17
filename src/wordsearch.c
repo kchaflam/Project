@@ -22,6 +22,8 @@ void inicializateWordsearch(wordsearch* board)
     for(int i = 0; i < board->size; i++) 
         for(int j = 0; j < board->size; j++) 
             board->table[i][j] = randomChar();
+
+    board->found_words = 0;
 }
 
 /*
@@ -31,13 +33,35 @@ void inicializateWordsearch(wordsearch* board)
  */
 void showWordsearch(wordsearch board) 
 {
-    for(int i = 0; i < board.size; i++) 
+    printf("\n   |");
+    for(int x = 0; x < board.size; x++) 
+        if (x < 9) 
+            printf(" %d  ", x + 1);
+        else
+            printf(" %d ", x + 1);
+
+    printf("\n");
+
+    printf("---|");
+    for(int g = 0; g < board.size; g++)          
+        printf("----");
+        
+    printf("\n");
+
+    for(int y = 0; y < board.size; y++) 
     {
-        for(int j = 0; j < board.size; j++) 
-            printf(" %c ", board.table[i][j]);
+        if (y < 9) 
+            printf("%d  |", y + 1);
+        else
+            printf("%d |", y + 1);
+
+        for(int j = 0; j < board.size; j++)          
+            printf(" %c  ", board.table[y][j]);
         
         printf("\n");
     }
+    
+    printf("\n");    
 }
 
 /*
@@ -93,6 +117,7 @@ void getWords(word words[]) {
         while (fscanf(file, "%s", words[i].word) != EOF)
         {
             words[i].num_char = strlen(words[i].word);
+            words[i].found = false;
 
             i++;
         }
@@ -111,7 +136,7 @@ void getWords(word words[]) {
 void showList(word words[])
 {
     for (int i = 0; i < getNumWords(); i++) 
-        printf("%s (%d lletres)\n", words[i].word, words[i].num_char);
+        printf("%s, %d, %d, %d, %d\n", words[i].word, words[i].num_char, words[i].startPos[0], words[i].startPos[1], words[i].direction );
 }
 
 /*
@@ -168,7 +193,7 @@ void fillWordsearch(wordsearch board, word words[], int num_words)
         
         for (int i = 0; i < words[t].num_char; i++)
         {
-            board.table[x + (orientation == 0) * i][y + (orientation == 1) * i] = words[t].word[i]; //Writes the word into the board.
+            board.table[y + (orientation == 1) * i] [x + (orientation == 0) * i]= words[t].word[i]; //Writes the word into the board.
 
             //Make record that this position is used in filled array.
             filled[num_fill][0] = x + (orientation == 0) * i; 
@@ -177,4 +202,40 @@ void fillWordsearch(wordsearch board, word words[], int num_words)
             num_fill++;
         }
     }
+}
+
+/*
+ * Fills the game board with the words to search.
+ *
+ * @param words
+ * @param num_words
+ * @param finded
+ */
+bool findWord(word words[], word finded, wordsearch board)
+{
+    bool exists = false;
+    int save = 0;
+    
+    for(int x=0; x < board.num_words; x++)
+    {
+        if(strcmp(finded.word, words[x].word))
+        {
+            exists = true;
+            save = 0;
+            x = board.num_words;
+        }
+    }
+    printf("\n%s,%d,%d,%d\n",words[save].word,words[save].startPos[0],words[save].startPos[1],words[save].direction);
+
+    if(exists && !words[save].found)
+    {
+        if((finded.startPos[0] == words[save].startPos[0] && finded.startPos[1] == words[save].startPos[1]) && finded.direction == words[save].direction)
+        {
+            words[save].found = true;
+            board.found_words++;
+
+        }
+    }
+
+    return words[save].found;
 }

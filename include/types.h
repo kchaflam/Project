@@ -27,6 +27,7 @@ typedef struct
     char word[MAX_LEN]; //The word saved.
     int num_char; //The lenght of the word.
     int direction;
+    bool found;
     int startPos[2];
 } word;
 
@@ -38,6 +39,7 @@ typedef struct
     char** table; //The game board with all the characters.
     int size; //The size of the board generated.
     int num_words; //The number of words in the game.
+    int found_words;
 } wordsearch;
 
 #endif
