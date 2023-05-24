@@ -8,6 +8,7 @@
 void game() {
     wordsearch board;
     word finded;
+    strcpy(finded.word, "");
 
     //Quick introdution to the game and information about the authors.
     printf("******************************************************\n");
@@ -27,6 +28,7 @@ void game() {
     } while (board.size >= 40 && board.size <= 10);
 
     board.num_words = getNumWords();
+    board.found_words = 0;
 
     word words[board.num_words];
     getWords(words);
@@ -35,7 +37,7 @@ void game() {
     showList(words);
     showWordsearch(board);
     
-    while(!strcmp(finded.word,"RENDICIO") && board.num_words != board.found_words)
+    while(strcmp(finded.word,"RENDICIO") && board.num_words != board.found_words)
     {
         printf("Digues el nom de la paraula que has trobat: ");
         scanf("%s", finded.word);

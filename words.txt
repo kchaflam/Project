@@ -1,3 +1,6 @@
-AMPETER
-MAINCRA
-RUBIUS
+rio
+pantano
+pueblo
+ciudad
+persona
+conejo

@@ -114,8 +114,11 @@ void getWords(word words[]) {
         i = 0;
 
         //Iterates trough all the rows in the file, saves the words found and also saves their lenght.
-        while (fscanf(file, "%s", words[i].word) != EOF)
+        char tempword[MAX_LEN];
+        while (fscanf(file, "%s", tempword) != EOF)
         {
+            strupr(tempword);
+            strcpy(words[i].word, tempword);
             words[i].num_char = strlen(words[i].word);
             words[i].found = false;
 
@@ -179,8 +182,10 @@ void fillWordsearch(wordsearch board, word words[], int num_words)
                     //Checks position by position if the word overlaps with any other word.
                     int position[2] = {x + (orientation == 0) * j, y + (orientation == 1) * j};
                     
-                    if (exists(position, filled, length))
-                        taken = true;
+                    for (int i = 0; i < length; i++)
+                        if ((filled[i][0] == position[0] && filled[i][1] == position[1]) && board.table[filled[i][0]][filled[i][1]] != words[t].word[j])
+                            taken = true;
+
                 }
             }
 
