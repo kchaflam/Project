@@ -13,3 +13,7 @@ void showList(word words[]);
 void fillWordsearch(wordsearch board, word words[], int num_words);
 
 bool findWord(word words[], word finded, wordsearch board);
+
+void imprimir(word words[], wordsearch board);
+
+bool coincideix(word words[], int x,int y);

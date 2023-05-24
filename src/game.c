@@ -65,9 +65,7 @@ void game() {
         } else
         {
             printf("%s no existeix.\n", finded.word);
-        }
-        
-        
+        }        
     }
     return;
 }

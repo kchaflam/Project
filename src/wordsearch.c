@@ -244,3 +244,67 @@ bool findWord(word words[], word finded, wordsearch board)
 
     return words[save].found;
 }
+
+void imprimir(word words[], wordsearch board)
+{
+    for(int i = 0; i < board.size; i++)
+    {
+        for(int j = 0;j < board.size; j++)
+        {
+            if(coincideix(words[],i,j))
+            {
+                printf("\033[0;32m%c\033[0m",board.table[i][j]);
+            }
+            else
+            {
+                printf(" %c ",board.table[i][j]); 
+            }
+    }
+
+    printf("\n");
+}
+
+bool coincideix(word words[], int x, int y)
+{
+    bool in = false;
+    int xaux;
+    int yaux;
+
+    for(int i = 0; words[i] != getNumWords; i++)
+    {
+        xaux= words->starPos[0];
+        yaux= words->starPos[1];
+
+        if(words[i]->found)
+        {
+            for(int j = 0; words[i]->num_char[j] != '\0'; j++)
+            {
+                if (words->direction == 0)
+                {
+                    if((x==xaux) && (y==yaux))
+                    {
+                        in = true;
+                    } 
+                    else
+                    {
+                        xaux++;
+                    }
+                }
+
+                if(words->direction == 1)
+                {
+                    if((x==xaux) && (y==yaux))
+                    {
+                        in = true;
+                    } 
+                    else
+                    {
+                        yaux++;
+                    } 
+                }
+            }
+        }
+    }
+
+    return in;
+}
