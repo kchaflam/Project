@@ -1,3 +1,5 @@
 #include "types.h"
 
-void game();
+void inicializateGame(wordsearch* board, word* finded, word* words);
+
+void gameIntroduction();

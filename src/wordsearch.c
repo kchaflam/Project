@@ -31,14 +31,20 @@ void inicializateWordsearch(wordsearch* board)
  *
  * @param board The struct with the array where the game board is stored. 
  */
-void showWordsearch(wordsearch board) 
+void showWordsearch(wordsearch board, bool answer) 
 {
+    answer = answer;
+    int t = 0; //Used to keep track of the positions of the letter that has to be colored when found.
+
+    //This and the next one of these kind are to show bars and make like a grid to show position numbers and letters clearer. 
     printf("\n   |");
-    for(int x = 0; x < board.size; x++) 
-        if (x < 9) 
-            printf(" %d  ", x + 1);
+
+    //Shows number in the upper side of the board. (X axis)
+    for(int h = 0; h < board.size; h++) 
+        if (h < 9) 
+            printf(" %d  ", h + 1);
         else
-            printf(" %d ", x + 1);
+            printf(" %d ", h + 1);
 
     printf("\n");
 
@@ -50,13 +56,27 @@ void showWordsearch(wordsearch board)
 
     for(int y = 0; y < board.size; y++) 
     {
+        //Shows numbers in the right side of the board. (Y axis)
         if (y < 9) 
             printf("%d  |", y + 1);
         else
             printf("%d |", y + 1);
 
-        for(int j = 0; j < board.size; j++)          
-            printf(" %c  ", board.table[y][j]);
+        //Shows all the letters in the board.
+        for(int x = 0; x < board.size; x++)
+        {
+            //Check the positions of the found words to change the color to make it clearer for the user. 
+            if(board.found_pos[t][0] == x && board.found_pos[t][1] == y)
+            {
+                //We use ANSI escape sequences to change the terminal color to make clear the words that the user has found.
+                //"\x1b[32m" is for green and "\x1b[0m" is to make it white again.
+                printf(" \x1b[32m%c\x1b[0m  ", board.table[y][x]);
+                t++;
+            } else 
+            {
+                printf(" %c  ", board.table[y][x]);
+            }
+        } 
         
         printf("\n");
     }
@@ -149,26 +169,25 @@ void showList(word words[])
  * @param words Array with the words.
  * @param num_words The number of words.
  */
-void fillWordsearch(wordsearch board, word words[], int num_words)
+void fillWordsearch(wordsearch* board, word words[], int num_words)
 {
     int x, y;
     int orientation;
     bool taken;
     
-    int length = getNumWords() * MAX_LEN; //Aproximated length of filled, that will be the number of words by de max length of a word.
-    int filled[length][2]; //List of positions that are alredy used.
-    int num_fill = 0; //Counter of length used of filled.
+    int length = getNumWords() * MAX_LEN; //Number of words by the max length of a word.
+    int num_fill = 0; //Counter of length used of board->solutions.
 
     for(int t = 0; t < num_words; t++)
     {
         do {
-            x = rand() % board.size;
-            y = rand() % board.size;
+            x = rand() % board->size;
+            y = rand() % board->size;
 
             //Sets the orientation of the word. 0 = Horizontal, 1 = Vertical.
-            if ((words[t].num_char + x) <= board.size)
+            if ((words[t].num_char + x) <= board->size)
                 orientation = 0;
-            else if ((words[t].num_char + y) <= board.size)
+            else if ((words[t].num_char + y) <= board->size)
                 orientation = 1;
             else 
                 orientation = 99; //If overlaps, sets the variable in a value equal to NULL.
@@ -183,7 +202,7 @@ void fillWordsearch(wordsearch board, word words[], int num_words)
                     int position[2] = {x + (orientation == 0) * j, y + (orientation == 1) * j};
                     
                     for (int i = 0; i < length; i++)
-                        if ((filled[i][0] == position[0] && filled[i][1] == position[1]) && board.table[filled[i][0]][filled[i][1]] != words[t].word[j])
+                        if ((board->solutions[i][0] == position[0] && board->solutions[i][1] == position[1]) && board->table[board->solutions[i][0]][board->solutions[i][1]] != words[t].word[j])
                             taken = true;
 
                 }
@@ -198,15 +217,16 @@ void fillWordsearch(wordsearch board, word words[], int num_words)
         
         for (int i = 0; i < words[t].num_char; i++)
         {
-            board.table[y + (orientation == 1) * i] [x + (orientation == 0) * i]= words[t].word[i]; //Writes the word into the board.
+            board->table[y + (orientation == 1) * i] [x + (orientation == 0) * i]= words[t].word[i]; //Writes the word into the board.
 
             //Make record that this position is used in filled array.
-            filled[num_fill][0] = x + (orientation == 0) * i; 
-            filled[num_fill][1] = y + (orientation == 1) * i;
+            board->solutions[num_fill][0] = x + (orientation == 0) * i; 
+            board->solutions[num_fill][1] = y + (orientation == 1) * i;
 
             num_fill++;
         }
     }
+    positionSort(board->solutions, num_fill);
 }
 
 /*
@@ -216,95 +236,40 @@ void fillWordsearch(wordsearch board, word words[], int num_words)
  * @param num_words
  * @param finded
  */
-bool findWord(word words[], word finded, wordsearch board)
+bool findWord(word words[], word finded, wordsearch* board)
 {
     bool exists = false;
     int save = 0;
     
-    for(int x=0; x < board.num_words; x++)
+    for(int x = 0; x < board->num_words; x++)
     {
-        if(strcmp(finded.word, words[x].word))
+        if(strcmp(finded.word, words[x].word) == 0)
         {
             exists = true;
-            save = 0;
-            x = board.num_words;
+            save = x;
+            x = board->num_words;
         }
     }
     printf("\n%s,%d,%d,%d\n",words[save].word,words[save].startPos[0],words[save].startPos[1],words[save].direction);
 
     if(exists && !words[save].found)
     {
+
         if((finded.startPos[0] == words[save].startPos[0] && finded.startPos[1] == words[save].startPos[1]) && finded.direction == words[save].direction)
         {
             words[save].found = true;
-            board.found_words++;
-
+            board->found_words += 1;
+            
+            for(int i = 0; i < words[save].num_char; i++)
+            {
+                board->found_pos[board->posFound_num][0] = words[save].startPos[0] + (words[save].direction == 0) * i; 
+                board->found_pos[board->posFound_num][1] = words[save].startPos[1] + (words[save].direction == 1) * i; 
+                board->posFound_num++;
+            }
+            
+            positionSort(board->found_pos, board->posFound_num);
         }
     }
 
     return words[save].found;
-}
-
-void imprimir(word words[], wordsearch board)
-{
-    for(int i = 0; i < board.size; i++)
-    {
-        for(int j = 0;j < board.size; j++)
-        {
-            if(coincideix(words[],i,j))
-            {
-                printf("\033[0;32m%c\033[0m",board.table[i][j]);
-            }
-            else
-            {
-                printf(" %c ",board.table[i][j]); 
-            }
-    }
-
-    printf("\n");
-}
-
-bool coincideix(word words[], int x, int y)
-{
-    bool in = false;
-    int xaux;
-    int yaux;
-
-    for(int i = 0; words[i] != getNumWords; i++)
-    {
-        xaux= words->starPos[0];
-        yaux= words->starPos[1];
-
-        if(words[i]->found)
-        {
-            for(int j = 0; words[i]->num_char[j] != '\0'; j++)
-            {
-                if (words->direction == 0)
-                {
-                    if((x==xaux) && (y==yaux))
-                    {
-                        in = true;
-                    } 
-                    else
-                    {
-                        xaux++;
-                    }
-                }
-
-                if(words->direction == 1)
-                {
-                    if((x==xaux) && (y==yaux))
-                    {
-                        in = true;
-                    } 
-                    else
-                    {
-                        yaux++;
-                    } 
-                }
-            }
-        }
-    }
-
-    return in;
 }

@@ -2,7 +2,7 @@
 
 void inicializateWordsearch(wordsearch* board);
 
-void showWordsearch(wordsearch board);
+void showWordsearch(wordsearch board, bool answer);
 
 int getNumWords();
 
@@ -10,10 +10,6 @@ void getWords(word words[]);
 
 void showList(word words[]);
 
-void fillWordsearch(wordsearch board, word words[], int num_words);
+void fillWordsearch(wordsearch* board, word words[], int num_words);
 
-bool findWord(word words[], word finded, wordsearch board);
-
-void imprimir(word words[], wordsearch board);
-
-bool coincideix(word words[], int x,int y);
+bool findWord(word words[], word finded, wordsearch* board);

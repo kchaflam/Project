@@ -41,6 +41,23 @@ void alphaSort(word words[], int numWords)
     }
 }
 
+void positionSort(int positions[][2], int length)
+{
+    for (int i = 0; i < length - 1; i++) {
+        for (int j = 0; j < length - i - 1; j++) {
+            if (positions[j][1] > positions[j + 1][1] || (positions[j][1] == positions[j + 1][1] && positions[j][0] > positions[j + 1][0])) {
+                // Intercambiar las posiciones
+                int tempX = positions[j][0];
+                int tempY = positions[j][1];
+                positions[j][0] = positions[j + 1][0];
+                positions[j][1] = positions[j + 1][1];
+                positions[j + 1][0] = tempX;
+                positions[j + 1][1] = tempY;
+            }
+        }
+    }
+}
+
 /*
  * Checks if two values exists in an array.
  *
