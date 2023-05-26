@@ -12,17 +12,17 @@ int main()
     
     gameIntroduction();
 
-    do
-    {
+    while(option != 2) {
+        bool lastwin = false;
         word finded;
         wordsearch board = blank;
         word words[MAX_WORDS];
 
-        do
+        while (option < 1 || option > 2) 
         {
             printf("\n1 - Vols jugar una partida?\n2 - Sortir\n");
             scanf("%d", &option);
-        } while (option < 1 || option > 2);
+        }
 
         if(option == 1)
             inicializateGame(&board, &finded, words);
@@ -89,27 +89,36 @@ int main()
                     printf("\nHas trobat la paraula %s!!! (%d/%d)\n", finded.word, board.found_words, board.num_words);
                 } else
                 {
-                    printf("%s no existeix en la posicio especificada! (%d, %d, ", finded.word, finded.startPos[0] + 1,finded.startPos[1] + 1);
+                    printf("\n%s no existeix en la posicio especificada! (%d, %d, ", finded.word, finded.startPos[0] + 1,finded.startPos[1] + 1);
                     if (finded.direction == 0)
                         printf("Horizontal)\n");
                     else
                         printf("Vertical)\n");
                 } 
             } 
+            
+            if (board.num_words == board.found_words)
+                lastwin = true;
         }
 
         if(strcmp(finded.word,"RENDICIO") == 0)
-            showWordsearch(board, true); 
-        else if (board.num_words != board.found_words)
-            printf("Has guanyat!\n Has esbrinat totes les paraules de la sopa!\n");
-            
-        while(option < 1 || option > 2)
         {
-            printf("1 - Vols jugar un altre cop?\n2 - Sortir\n");
-            scanf("%d", &option);
+            showWordsearch(board, true); 
+            printf("\nT'has rendit!\n");
         }
+        else if (lastwin)
+            printf("\nHas guanyat!!!\nHas esbrinat totes les paraules de la sopa!\n");
         
-    } while(option != 2);
-    
+        if (option == 1)
+        {
+            option = 0;
+            while(option < 1 || option > 2)
+            {
+                printf("\n1 - Vols jugar un altre cop?\n2 - Sortir\n");
+                scanf("%d", &option);
+            }
+        }
+    } 
+
     return 0;
 }

@@ -241,17 +241,20 @@ void fillWordsearch(wordsearch* board, word words[], int num_words)
 }
 
 /*
- * Fills the game board with the words to search.
+ * Checks if the specified word and its positions are in the right place.
  *
- * @param words
- * @param num_words
- * @param finded
+ * @param words All the words and their information.
+ * @param finded The word the user guessed.
+ * @param board The board of the game.
+ * 
+ * @return
  */
 bool findWord(word words[], word finded, wordsearch* board)
 {
     bool exists = false;
     int save = 0;
     
+    //Checks the word is in the board and saves the position.
     for(int x = 0; x < board->num_words; x++)
     {
         if(strcmp(finded.word, words[x].word) == 0)
@@ -264,6 +267,7 @@ bool findWord(word words[], word finded, wordsearch* board)
 
     if(exists && !words[save].found)
     {
+        //Compares the specified position of the user word with the real position.
         if((finded.startPos[0] == words[save].startPos[0] && finded.startPos[1] == words[save].startPos[1]) && finded.direction == words[save].direction)
         {
             words[save].found = true;
