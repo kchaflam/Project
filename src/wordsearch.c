@@ -33,8 +33,8 @@ void inicializateWordsearch(wordsearch* board)
  */
 void showWordsearch(wordsearch board, bool answer) 
 {
-    answer = answer;
     int t = 0; //Used to keep track of the positions of the letter that has to be colored when found.
+    int s = 0; //Used to keep track of the positions of the letter that has to be colored when found if the player surrended.
 
     //This and the next one of these kind are to show bars and make like a grid to show position numbers and letters clearer. 
     printf("\n   |");
@@ -65,13 +65,18 @@ void showWordsearch(wordsearch board, bool answer)
         //Shows all the letters in the board.
         for(int x = 0; x < board.size; x++)
         {
-            //Check the positions of the found words to change the color to make it clearer for the user. 
-            if(board.found_pos[t][0] == x && board.found_pos[t][1] == y)
+            if(board.found_pos[t][0] == x && board.found_pos[t][1] == y) //Check the positions of the found words to change the color to make it clearer for the user. 
             {
                 //We use ANSI escape sequences to change the terminal color to make clear the words that the user has found.
                 //"\x1b[32m" is for green and "\x1b[0m" is to make it white again.
                 printf(" \x1b[32m%c\x1b[0m  ", board.table[y][x]);
                 t++;
+                s++;
+            } else if(board.solutions[s][0] == x && board.solutions[s][1] == y && answer) //If the user surrenders, shows all the words to be found in color red.
+            {
+                //"\x1b[31m" is for red.
+                printf(" \x1b[31m%c\x1b[0m  ", board.table[y][x]);
+                s++;
             } else 
             {
                 printf(" %c  ", board.table[y][x]);
@@ -80,8 +85,6 @@ void showWordsearch(wordsearch board, bool answer)
         
         printf("\n");
     }
-    
-    printf("\n");    
 }
 
 /*
@@ -152,14 +155,21 @@ void getWords(word words[]) {
 }
 
 /*
- * Shows the word and its lenght.
+ * Shows the words to be found.
  *
- * @param words Array with the words and their lenght. 
+ * @param words Array with the words. 
  */
 void showList(word words[])
 {
-    for (int i = 0; i < getNumWords(); i++) 
-        printf("%s, %d, %d, %d, %d\n", words[i].word, words[i].num_char, words[i].startPos[0], words[i].startPos[1], words[i].direction );
+    printf("\nParaules que tens que trobar:");
+
+    for (int i = 0; i < getNumWords(); i++)
+        if (!words[i].found)
+            printf(" %s ", words[i].word);
+        else
+            printf(" \x1b[32m%s\x1b[0m ", words[i].word); //Shows the word in green if found.
+
+    printf("\n");
 }
 
 /*
@@ -202,7 +212,7 @@ void fillWordsearch(wordsearch* board, word words[], int num_words)
                     int position[2] = {x + (orientation == 0) * j, y + (orientation == 1) * j};
                     
                     for (int i = 0; i < length; i++)
-                        if ((board->solutions[i][0] == position[0] && board->solutions[i][1] == position[1]) && board->table[board->solutions[i][0]][board->solutions[i][1]] != words[t].word[j])
+                        if ((board->solutions[i][0] == position[0] && board->solutions[i][1] == position[1]))
                             taken = true;
 
                 }
@@ -226,6 +236,7 @@ void fillWordsearch(wordsearch* board, word words[], int num_words)
             num_fill++;
         }
     }
+    
     positionSort(board->solutions, num_fill);
 }
 
@@ -250,11 +261,9 @@ bool findWord(word words[], word finded, wordsearch* board)
             x = board->num_words;
         }
     }
-    printf("\n%s,%d,%d,%d\n",words[save].word,words[save].startPos[0],words[save].startPos[1],words[save].direction);
 
     if(exists && !words[save].found)
     {
-
         if((finded.startPos[0] == words[save].startPos[0] && finded.startPos[1] == words[save].startPos[1]) && finded.direction == words[save].direction)
         {
             words[save].found = true;

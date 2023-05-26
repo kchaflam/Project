@@ -11,16 +11,6 @@
 #define MAX_WORDS 10 //The maximum number of words in a list.
 
 /*
- * Struct with all the information about the player.
- */
-typedef struct
-{
-    int finds;
-    int mistakes;
-    int score;
-} player;
-
-/*
  * Struct to save a word and its information needed for the game.
  */
 typedef struct
